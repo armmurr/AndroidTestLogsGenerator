@@ -8,7 +8,7 @@
 * **process:system_server** - сообщения принадлежащие процессу с именем **system_server**
 * **is:crash** - все краши
 * **age:2m** - все сообщения, не старше **2m**
-* **(tag:tag1 | tag:examplecustomtag2) & level:verbose**
+* **(tag:tag1 | tag:examplecustomtag2) & level:verbose** - поиск с логическими выражениями, все сообщения где есть или **tag1** или **examplecustomtag2** c уровнем **Debug**
 * **-message:"Exception"** - поиск с отрицанием, все сообщения, где нет слова **Exception**
 * **message~:Exception.\*fatal** - поиск с регулярным выражением, все сообщения, где после **Exception** через любое количество символов есть слово **fatal**
 * **tag~:tag\d** - поиск с регулярным выражением, все сообщения, где после **tag** есть число
