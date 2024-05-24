@@ -45,8 +45,7 @@ class LogStarter(
             { _, customMessage -> customMessage },
             { messageLength, _ -> getRandomString(messageLength) },
             { _, _ ->
-                val exception = Exception()
-                Log.getStackTraceString(exception)
+                Log.getStackTraceString(Throwable())
             }
         )
 

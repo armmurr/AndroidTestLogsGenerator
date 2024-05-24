@@ -25,6 +25,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 
+const val ACTIONS_TAG = "UserActions"
+const val STATE_TAG = "AppStates"
 class LogGeneratorViewModel : ViewModel() {
     private val _startedJobs = mutableStateListOf<Pair<Job?, String>>()
     val startedJobs: List<Pair<Job?, String>> = _startedJobs
@@ -32,37 +34,42 @@ class LogGeneratorViewModel : ViewModel() {
     fun startLogGenerator(logOptions: LogOptions) {
         viewModelScope.launch {
             val job = LogStarter(logOptions, this).start()
+            val jobName =  "\"${logOptions.logLevel.name} " +
+                    "${logOptions.messageType} " +
+                    if (logOptions.shouldRepeat) {"${logOptions.repeatTimeout.inWholeMilliseconds}ms"} else {""} +
+                            "${logOptions.tag}\""
             if (!logOptions.shouldRepeat) {
                 delay(300.toDuration(DurationUnit.MILLISECONDS))
                 job.cancel()
+                Log.i(STATE_TAG,"[startLogGenerator] One time Job $jobName has been performed")
             } else {
                 _startedJobs.add(
                     Pair(
                         job,
-                        "${logOptions.logLevel.name} " +
-                                "${logOptions.messageType} " +
-                                "${logOptions.repeatTimeout.inWholeMilliseconds}ms:  ${logOptions.tag}"
+                        jobName
                     )
                 )
+                Log.i(STATE_TAG,"[startLogGenerator] Repeated Job $jobName has been started")
             }
         }
     }
 
     fun stopAllJobs () {
-
-            val jobsToStop = startedJobs.toList()
-            jobsToStop.forEach {
-                stopJob(it.first)
-            }
-
+        val jobsToStop = startedJobs.toList()
+        jobsToStop.forEach {
+            stopJob(it.first)
+        }
+        Log.i(STATE_TAG,"[stopAllJobs] All jobs have been stopped")
     }
 
     fun stopJob(job: Job?) {
         job?.cancel()
         val index = _startedJobs.indexOfFirst { it.first == job }
         if (index >= 0) {
-            _startedJobs[index] = _startedJobs[index].copy(first = null)
+            val jobName = _startedJobs[index]
+            //_startedJobs[index] = _startedJobs[index].copy(first = null)
             _startedJobs.remove(_startedJobs[index])
+            Log.i(STATE_TAG,"[stopJob] Job ${jobName.second} has been stopped")
         }
     }
 }
@@ -92,8 +99,10 @@ fun LogGeneratorInterface() {
                     .clickable {
                         expanded = !expanded
                         Log.i(
-                            "LogGenerator", "Spoiler for LogGenerator has been clicked" +
-                                    "\nActual state is ${if (expanded) "opened" else "closed"}"
+                            ACTIONS_TAG, "Spoiler for LogGenerator has been clicked"
+                        )
+                        Log.i(
+                            STATE_TAG, "Spoiler for LogGenerator is ${if (expanded) "opened" else "closed"}"
                         )
                     }
                     .padding(16.dp),
@@ -121,7 +130,9 @@ fun LogGeneratorInterface() {
                         label = "Log Level",
                         selectedOption = logOptions.logLevel,
                         options = LogLevel.entries.toTypedArray(),
-                        onSelectionChange = { logOptions = logOptions.copy(logLevel = it) }
+                        onSelectionChange = {
+                            logOptions = logOptions.copy(logLevel = it)
+                            Log.i(ACTIONS_TAG, "Log Level is set to $it")}
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     DropdownMenuForEnum(
@@ -130,6 +141,7 @@ fun LogGeneratorInterface() {
                         options = MessageType.entries.toTypedArray(),
                         onSelectionChange = {
                             logOptions = logOptions.copy(messageType = it)
+                            Log.i(ACTIONS_TAG, "Message Type is set to $it")
                         }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -140,10 +152,12 @@ fun LogGeneratorInterface() {
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
                             value = logOptions.randomMessageLength.toString(),
                             onValueChange = {
+                                val value = it.toIntOrNull()
+                                    ?: logOptions.randomMessageLength
                                 logOptions = logOptions.copy(
-                                    randomMessageLength = it.toIntOrNull()
-                                        ?: logOptions.randomMessageLength
+                                    randomMessageLength = value
                                 )
+                                Log.i(ACTIONS_TAG, "randomMessageLength is set to $value")
                             },
                             label = { Text("Random Message Length") },
                             modifier = Modifier.fillMaxWidth()
@@ -154,7 +168,9 @@ fun LogGeneratorInterface() {
                         OutlinedTextField(
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
                             value = logOptions.customMessage,
-                            onValueChange = { logOptions = logOptions.copy(customMessage = it) },
+                            onValueChange = {
+                                logOptions = logOptions.copy(customMessage = it)
+                                Log.i(ACTIONS_TAG, "Custom Message is set to $it") },
                             label = { Text("Custom Message") },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -163,7 +179,10 @@ fun LogGeneratorInterface() {
                     OutlinedTextField(
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
                         value = logOptions.tag,
-                        onValueChange = { logOptions = logOptions.copy(tag = it) },
+                        onValueChange = {
+                            logOptions = logOptions.copy(tag = it)
+                            Log.i(ACTIONS_TAG, "Tag is set to $it")
+                        },
                         label = { Text("Tag") },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -171,7 +190,10 @@ fun LogGeneratorInterface() {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(
                             checked = logOptions.shouldRepeat,
-                            onCheckedChange = { logOptions = logOptions.copy(shouldRepeat = it) }
+                            onCheckedChange = {
+                                logOptions = logOptions.copy(shouldRepeat = it)
+                                Log.i(ACTIONS_TAG, "Repeat checkbox has been ${if (it) "checked" else "unchecked"}")
+                            }
                         )
                         Text("Repeat")
                     }
@@ -183,11 +205,13 @@ fun LogGeneratorInterface() {
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
                             value = logOptions.repeatTimeout.inWholeMilliseconds.toString(),
                             onValueChange = {
+                                val value = it.toLongOrNull()
+                                    ?.toDuration(DurationUnit.MILLISECONDS)
+                                    ?: logOptions.repeatTimeout
                                 logOptions = logOptions.copy(
-                                    repeatTimeout = it.toLongOrNull()
-                                        ?.toDuration(DurationUnit.MILLISECONDS)
-                                        ?: logOptions.repeatTimeout
+                                    repeatTimeout = value
                                 )
+                                Log.i(ACTIONS_TAG, "Repeat Timeout (ms) is set to ${value.inWholeMilliseconds}ms")
                             },
                             label = { Text("Repeat Timeout (ms)") },
                             modifier = Modifier.fillMaxWidth()
@@ -201,6 +225,7 @@ fun LogGeneratorInterface() {
                             .fillMaxWidth(),
                         onClick = {
                             viewModel.startLogGenerator(logOptions)
+                            Log.i(ACTIONS_TAG, "Start custom job button has been pushed")
                         }
                     ) {
                         Text("Start")
@@ -254,7 +279,10 @@ fun RunningJobsList(viewModel: LogGeneratorViewModel) {
                             modifier = Modifier.weight(7f)
                         )
                         Button(
-                            onClick = { onStopJob(it.first) },
+                            onClick = {
+                                Log.i(ACTIONS_TAG, "Stop job ${it.second} button has been pushed")
+                                onStopJob(it.first)
+                            },
                             modifier = Modifier.weight(2f)
                         ) {
                             Text("Stop")
@@ -311,7 +339,7 @@ fun <T : Enum<T>> DropdownMenuForEnum(
 fun SpecialActionButton(specialActionType: SpecialActionType) {
     Button(
         onClick = {
-            Log.i("SpecialActionsExecutor", "Button $specialActionType has been pushed")
+            Log.i(ACTIONS_TAG, "Button $specialActionType has been pushed")
             SpecialActionsExecutor().performAction(specialActionType)
         },
         modifier = Modifier
@@ -338,8 +366,10 @@ fun SpecialActionsSpoiler() {
                 .clickable {
                     expanded = !expanded
                     Log.i(
-                        "SpecialActionsExecutor", "Spoiler for SpecialActions has been clicked" +
-                                "\nActual state is ${if (expanded) "opened" else "closed"}"
+                        ACTIONS_TAG, "Spoiler for SpecialActions has been clicked"
+                    )
+                    Log.i(
+                        STATE_TAG, "Spoiler for SpecialActions is ${if (expanded) "opened" else "closed"}"
                     )
                 }
                 .padding(16.dp),
@@ -378,7 +408,7 @@ fun SpecialActionsSpoiler() {
 fun StartPresets(logOptionsList: List<LogOptions>, viewModel: LogGeneratorViewModel) {
     Button(
         onClick = {
-            Log.i("SpecialActionsExecutor", "Start presets button has been pushed")
+            Log.i(ACTIONS_TAG, "Start presets button has been pushed")
             logOptionsList.forEach {
                 viewModel.startLogGenerator(it)
             }
@@ -398,10 +428,8 @@ fun StartPresets(logOptionsList: List<LogOptions>, viewModel: LogGeneratorViewMo
 fun StopAllJobs(viewModel: LogGeneratorViewModel) {
     Button(
         onClick = {
-            Log.i("SpecialActionsExecutor", "Stop all jobs button has been pushed")
-
-                viewModel.stopAllJobs()
-
+            Log.i(ACTIONS_TAG, "Stop all jobs button has been pushed")
+            viewModel.stopAllJobs()
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -419,14 +447,14 @@ fun getLogOptionsPresets():List<LogOptions> {
         LogOptions(
             logLevel = LogLevel.RANDOM,
             messageType = MessageType.RANDOM,
-            repeatTimeout = 200.toDuration(DurationUnit.MILLISECONDS),
+            repeatTimeout = 100.toDuration(DurationUnit.MILLISECONDS),
             shouldRepeat = true,
-            randomMessageLength = 300
+            randomMessageLength = 1000
         ),
         LogOptions(
             logLevel = LogLevel.WARN,
             messageType = MessageType.JSON,
-            repeatTimeout = 200.toDuration(DurationUnit.MILLISECONDS),
+            repeatTimeout = 100.toDuration(DurationUnit.MILLISECONDS),
             shouldRepeat = true,
         ),
         LogOptions(
@@ -446,7 +474,7 @@ fun getLogOptionsPresets():List<LogOptions> {
         LogOptions(
             logLevel = LogLevel.VERBOSE,
             messageType = MessageType.STRING,
-            repeatTimeout = 2000.toDuration(DurationUnit.MILLISECONDS),
+            repeatTimeout = 500.toDuration(DurationUnit.MILLISECONDS),
             shouldRepeat = true,
             tag = "ExampleCustomTag2",
             customMessage = "Example Tag2 message"
