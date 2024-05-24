@@ -36,7 +36,7 @@ class LogGeneratorViewModel : ViewModel() {
             val job = LogStarter(logOptions, this).start()
             val jobName =  "\"${logOptions.logLevel.name} " +
                     "${logOptions.messageType} " +
-                    if (logOptions.shouldRepeat) {"${logOptions.repeatTimeout.inWholeMilliseconds}ms"} else {""} +
+                    if (logOptions.shouldRepeat) {"${logOptions.repeatTimeout.inWholeMilliseconds}ms "} else {""} +
                             "${logOptions.tag}\""
             if (!logOptions.shouldRepeat) {
                 delay(300.toDuration(DurationUnit.MILLISECONDS))
