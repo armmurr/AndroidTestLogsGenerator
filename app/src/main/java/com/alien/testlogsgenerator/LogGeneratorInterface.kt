@@ -1,6 +1,5 @@
 package com.alien.testlogsgenerator
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -50,12 +49,12 @@ class LogGeneratorViewModel : ViewModel() {
     }
 
     fun stopAllJobs () {
-        startedJobs.forEach{
+
             val jobsToStop = startedJobs.toList()
             jobsToStop.forEach {
                 stopJob(it.first)
             }
-        }
+
     }
 
     fun stopJob(job: Job?) {
@@ -68,8 +67,6 @@ class LogGeneratorViewModel : ViewModel() {
     }
 }
 
-
-@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun LogGeneratorInterface() {
     val viewModel: LogGeneratorViewModel = viewModel()
@@ -418,8 +415,7 @@ fun StopAllJobs(viewModel: LogGeneratorViewModel) {
 }
 
 fun getLogOptionsPresets():List<LogOptions> {
-
-    return listOf<LogOptions>(
+    return listOf(
         LogOptions(
             logLevel = LogLevel.RANDOM,
             messageType = MessageType.RANDOM,
