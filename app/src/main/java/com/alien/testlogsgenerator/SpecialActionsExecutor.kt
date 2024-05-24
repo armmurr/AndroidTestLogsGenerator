@@ -5,21 +5,26 @@ import android.util.Log
 import java.lang.NullPointerException
 
 class SpecialActionsExecutor {
-
-     fun performAction(actionType: SpecialActionType) {
+    private val TAG = "SpecialActionsExecutor"
+    fun performAction(actionType: SpecialActionType) {
         when (actionType) {
-            SpecialActionType.ANR -> {sleep(5000)}
-            SpecialActionType.CRASH -> throw RuntimeException("This is a simulated crash")
-            SpecialActionType.NPE -> throw NullPointerException("This is a simulated NPE")
+            SpecialActionType.ANR -> {
+                sleep(8000)
+            }
+            SpecialActionType.CRASH -> {
+                throw RuntimeException("This is a simulated crash")
+            }
+            SpecialActionType.NPE -> {
+                throw NullPointerException("This is a simulated NPE")
+            }
             SpecialActionType.NON_FATAL -> try {
                 throw RuntimeException("This is a simulated non-fatal exception")
             } catch (e: Exception) {
-                Log.e("SpecialActionsExecutor", "", e)
+                Log.e(TAG, "Simulated non-fatal exception", e)
             }
         }
 
     }
-
 }
 
 //TODO:

@@ -1,22 +1,18 @@
 package com.alien.testlogsgenerator
 
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.random.Random
 
 class LogStarter(
     private val logOptions: LogOptions = LogOptions(),
     private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
-)
-{
-    fun start() {
-        coroutineScope.launch {
+) {
+    fun start(): Job {
+        return coroutineScope.launch {
             var counter = 1
             if (logOptions.shouldRepeat) {
-                while (true) {
+                while (isActive) {
                     delay(logOptions.repeatTimeout)
                     getLog(logOptions, counter)
                     counter++
@@ -27,7 +23,7 @@ class LogStarter(
         }
     }
 
-    private fun getLog (logOptions: LogOptions, counter: Int) {
+    private fun getLog(logOptions: LogOptions, counter: Int) { // Add onLogMessage
         val logLevel: Int by lazy {
             if (logOptions.logLevel.levelInt == -1) {
                 (2..7).random()
@@ -35,31 +31,20 @@ class LogStarter(
                 logOptions.logLevel.levelInt
             }
         }
-        Log.println(
-            logLevel,
-            logOptions.tag,
-            getMessage(
-                logOptions.messageType,
-                logOptions.randomMessageLength,
-                logOptions.customMessage
-            ) + if (logOptions.shouldAddMessageCounter) " $counter" else ""
-        )
+        val message = getMessage(
+            logOptions.messageType,
+            logOptions.randomMessageLength,
+            logOptions.customMessage
+        ) + if (logOptions.shouldAddMessageCounter) " $counter" else ""
+        Log.println(logLevel, logOptions.tag, message)
     }
 
     private fun getMessageByType(messageType: MessageType): (Int, String) -> String {
         val arrayOfFunctions: Array<(messageLength: Int, customMessage: String) -> String> = arrayOf(
-            {
-                    _,_ -> JSON
-            },
-            {
-                    _,customMessage -> customMessage
-            },
-            {
-                    messageLength,_ ->  getRandomString(messageLength)
-
-            },
-            {
-                    _,_ ->
+            { _, _ -> JSON },
+            { _, customMessage -> customMessage },
+            { messageLength, _ -> getRandomString(messageLength) },
+            { _, _ ->
                 val exception = Exception()
                 Log.getStackTraceString(exception)
             }
@@ -68,16 +53,16 @@ class LogStarter(
         return if (messageType.value == 0) {
             arrayOfFunctions.random()
         } else {
-            arrayOfFunctions[messageType.value-1]
+            arrayOfFunctions[messageType.value - 1]
         }
     }
 
-    private fun getMessage(messageType: MessageType, messageLength: Int, customMessage: String):String{
-        return getMessageByType(messageType)(messageLength,customMessage)
+    private fun getMessage(messageType: MessageType, messageLength: Int, customMessage: String): String {
+        return getMessageByType(messageType)(messageLength, customMessage)
     }
 }
 
-fun getRandomString(length: Int, spaceProbability: Double = 0.2) : String {
+fun getRandomString(length: Int, spaceProbability: Double = 0.2): String {
     val charset = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz0123456789"
     return (1..length)
         .map { if (Random.nextDouble() < spaceProbability) ' ' else charset.random() }
