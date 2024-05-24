@@ -472,7 +472,7 @@ fun getLogOptionsPresets():List<LogOptions> {
             customMessage = "Custom message for ExampleCustomTag1"
         ),
         LogOptions(
-            logLevel = LogLevel.VERBOSE,
+            logLevel = LogLevel.DEBUG,
             messageType = MessageType.STRING,
             repeatTimeout = 500.toDuration(DurationUnit.MILLISECONDS),
             shouldRepeat = true,
