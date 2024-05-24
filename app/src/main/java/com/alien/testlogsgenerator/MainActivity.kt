@@ -17,8 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.alien.testlogsgenerator.ui.theme.TestLogsGeneratorTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -45,19 +43,18 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-
         LogStarter(
             LogOptions(
             logLevel = LogLevel.RANDOM,
             messageType = MessageType.RANDOM_STRING,
-            repeatTimeout = 20.toDuration(DurationUnit.MILLISECONDS),
+            repeatTimeout = 200.toDuration(DurationUnit.MILLISECONDS),
             shouldRepeat = true,
             randomMessageLength = 300
         )
         ).start()
         LogStarter(
             LogOptions(
-            logLevel = LogLevel.RANDOM,
+            logLevel = LogLevel.WARN,
             messageType = MessageType.JSON,
             repeatTimeout = 200.toDuration(DurationUnit.MILLISECONDS),
             shouldRepeat = true,
@@ -73,11 +70,11 @@ class MainActivity : ComponentActivity() {
         ).start()
         LogStarter(
             LogOptions(
-            logLevel = LogLevel.ERROR,
+            logLevel = LogLevel.INFO,
             messageType = MessageType.STRING,
             repeatTimeout = 2000.toDuration(DurationUnit.MILLISECONDS),
             shouldRepeat = true,
-            tag = "ExampleCustomTag1",
+            tag = "Tag1",
             customMessage = "Custom message for ExampleCustomTag1"
         )
         ).start()
@@ -88,8 +85,18 @@ class MainActivity : ComponentActivity() {
             repeatTimeout = 2000.toDuration(DurationUnit.MILLISECONDS),
             shouldRepeat = true,
             tag = "ExampleCustomTag2",
-            customMessage = "ExampleCustomTag2 custom message"
+            customMessage = "Example Tag2 message"
         )
+        ).start()
+        LogStarter(
+            LogOptions(
+                logLevel = LogLevel.ERROR,
+                messageType = MessageType.STRING,
+                repeatTimeout = 2000.toDuration(DurationUnit.MILLISECONDS),
+                shouldRepeat = true,
+                tag = "ExampleTag3",
+                customMessage = "Tag3 custom message"
+            )
         ).start()
     }
 }

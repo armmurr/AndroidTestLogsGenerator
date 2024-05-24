@@ -8,7 +8,7 @@ class SpecialActionsExecutor {
 
      fun performAction(actionType: SpecialActionType) {
         when (actionType) {
-            SpecialActionType.ANR -> sleep(20000)
+            SpecialActionType.ANR -> {sleep(5000)}
             SpecialActionType.CRASH -> throw RuntimeException("This is a simulated crash")
             SpecialActionType.NPE -> throw NullPointerException("This is a simulated NPE")
             SpecialActionType.NON_FATAL -> try {
