@@ -19,10 +19,6 @@ class MainActivity : ComponentActivity() {
     private val mainActivityActionsTag = "MainActivityActions"
     private val list = mutableStateListOf<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        val logStr = "onCreate(savedInstanceState: Bundle?)"
-        list.add(logStr)
-        Log.i(mainActivityActionsTag,logStr)
         if (savedInstanceState != null) {
             val savedList = savedInstanceState.getStringArrayList("log_list")
             if (savedList != null) {
@@ -32,6 +28,9 @@ class MainActivity : ComponentActivity() {
             list.add(saveInstStateLog)
             Log.i(mainActivityActionsTag,saveInstStateLog)
         }
+        val logStr = "onCreate(savedInstanceState: Bundle?)"
+        list.add(logStr)
+        Log.i(mainActivityActionsTag,logStr)
 
         super.onCreate(savedInstanceState)
         setContent {
