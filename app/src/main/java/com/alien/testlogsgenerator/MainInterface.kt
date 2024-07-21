@@ -95,7 +95,7 @@ fun MainInterface(list: SnapshotStateList<String>) {
         SpecialActionsSpoiler()
         Spacer(modifier = Modifier.height(16.dp))
 
-        ComposableList(list)
+        PastActivityStatesList(list)
     }
 }
 
@@ -439,7 +439,7 @@ fun DropDown(text:String, content: @Composable () -> Unit) {
     }
 }
 @Composable
-fun ComposableList(list: SnapshotStateList<String>) {
+fun PastActivityStatesList(list: SnapshotStateList<String>) {
     val listState = rememberLazyListState()
     LaunchedEffect(list.size) {
         listState.animateScrollToItem(index = list.size - 1)

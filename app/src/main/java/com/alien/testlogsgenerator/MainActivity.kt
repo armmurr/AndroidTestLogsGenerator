@@ -17,19 +17,19 @@ import com.alien.testlogsgenerator.ui.theme.TestLogsGeneratorTheme
 
 class MainActivity : ComponentActivity() {
     private val mainActivityActionsTag = "MainActivityActions"
-    private val list = mutableStateListOf<String>()
+    private val listOfStates = mutableStateListOf<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
             val savedList = savedInstanceState.getStringArrayList("log_list")
             if (savedList != null) {
-                list.addAll(savedList)
+                listOfStates.addAll(savedList)
             }
             val saveInstStateLog = "savedInstanceState is not mull"
-            list.add(saveInstStateLog)
+            listOfStates.add(saveInstStateLog)
             Log.i(mainActivityActionsTag,saveInstStateLog)
         }
         val logStr = "onCreate(savedInstanceState: Bundle?)"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
 
         super.onCreate(savedInstanceState)
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     Column(
                         verticalArrangement = Arrangement.Top
                     ) {
-                        MainInterface(list)
+                        MainInterface(listOfStates)
                     }
                 }
             }
@@ -51,71 +51,71 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         val logStr = "onStart()"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onStart()
     }
 
     override fun onResume() {
         val logStr = "onResume()"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onResume()
     }
 
     override fun onPause() {
         val logStr = "onPause()"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onPause()
     }
 
     override fun onStop() {
         val logStr = "onStop()"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onStop()
     }
 
     override fun onRestart() {
         val logStr = "onRestart()"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onRestart()
     }
 
     override fun onDestroy() {
         val logStr = "onDestroy()"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         val logStr = "onSaveInstanceState(outState: Bundle)"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onSaveInstanceState(outState)
-        outState.putStringArrayList("log_list", ArrayList(list))
+        outState.putStringArrayList("log_list", ArrayList(listOfStates))
     }
 
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         val logStr = "onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle)"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onSaveInstanceState(outState, outPersistentState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         val logStr = "onRestoreInstanceState(savedInstanceState: Bundle)"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onRestoreInstanceState(savedInstanceState)
     }
 
     override fun onLowMemory() {
         val logStr = "onLowMemory()"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onLowMemory()
     }
@@ -123,7 +123,7 @@ class MainActivity : ComponentActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         // не будет вызываться так как в манифесте не прописан android:configChanges
         val logStr = "onConfigurationChanged(newConfig: Configuration)"
-        list.add(logStr)
+        listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onConfigurationChanged(newConfig)
     }
