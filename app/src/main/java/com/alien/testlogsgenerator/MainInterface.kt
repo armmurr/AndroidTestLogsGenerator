@@ -16,10 +16,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.ImeAction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -75,9 +78,7 @@ class LogGeneratorViewModel : ViewModel() {
 }
 
 @Composable
-fun LogGeneratorInterface() {
-    val viewModel: LogGeneratorViewModel = viewModel()
-    var logOptions by remember { mutableStateOf(LogOptions()) }
+fun MainInterface(list: SnapshotStateList<String>) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -88,163 +89,150 @@ fun LogGeneratorInterface() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        var expanded by remember { mutableStateOf(false) }
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(),
-            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .clickable {
-                        expanded = !expanded
-                        Log.i(
-                            ACTIONS_TAG, "Spoiler for LogGenerator has been clicked"
-                        )
-                        Log.i(
-                            STATE_TAG, "Spoiler for LogGenerator is ${if (expanded) "opened" else "closed"}"
-                        )
-                    }
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Генератор логов",
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                    contentDescription = "Expand"
-                )
-            }
-
-            AnimatedVisibility(
-                visible = expanded,
-                enter = expandVertically(),
-                exit = shrinkVertically(),
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp)
-            ) {
-                Column {
-                    DropdownMenuForEnum(
-                        label = "Log Level",
-                        selectedOption = logOptions.logLevel,
-                        options = LogLevel.entries.toTypedArray(),
-                        onSelectionChange = {
-                            logOptions = logOptions.copy(logLevel = it)
-                            Log.i(ACTIONS_TAG, "Log Level is set to $it")}
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    DropdownMenuForEnum(
-                        label = "Message Type",
-                        selectedOption = logOptions.messageType,
-                        options = MessageType.entries.toTypedArray(),
-                        onSelectionChange = {
-                            logOptions = logOptions.copy(messageType = it)
-                            Log.i(ACTIONS_TAG, "Message Type is set to $it")
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    if ((logOptions.messageType == MessageType.RANDOM) ||
-                        (logOptions.messageType == MessageType.RANDOM_STRING)
-                    ) {
-                        OutlinedTextField(
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
-                            value = logOptions.randomMessageLength.toString(),
-                            onValueChange = {
-                                val value = it.toIntOrNull()
-                                    ?: logOptions.randomMessageLength
-                                logOptions = logOptions.copy(
-                                    randomMessageLength = value
-                                )
-                                Log.i(ACTIONS_TAG, "randomMessageLength is set to $value")
-                            },
-                            label = { Text("Random Message Length") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                    if ((logOptions.messageType == MessageType.STRING)) {
-                        OutlinedTextField(
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
-                            value = logOptions.customMessage,
-                            onValueChange = {
-                                logOptions = logOptions.copy(customMessage = it)
-                                Log.i(ACTIONS_TAG, "Custom Message is set to $it") },
-                            label = { Text("Custom Message") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                    OutlinedTextField(
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
-                        value = logOptions.tag,
-                        onValueChange = {
-                            logOptions = logOptions.copy(tag = it)
-                            Log.i(ACTIONS_TAG, "Tag is set to $it")
-                        },
-                        label = { Text("Tag") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = logOptions.shouldRepeat,
-                            onCheckedChange = {
-                                logOptions = logOptions.copy(shouldRepeat = it)
-                                Log.i(ACTIONS_TAG, "Repeat checkbox has been ${if (it) "checked" else "unchecked"}")
-                            }
-                        )
-                        Text("Repeat")
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    if (logOptions.shouldRepeat) {
-
-                        OutlinedTextField(
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
-                            value = logOptions.repeatTimeout.inWholeMilliseconds.toString(),
-                            onValueChange = {
-                                val value = it.toLongOrNull()
-                                    ?.toDuration(DurationUnit.MILLISECONDS)
-                                    ?: logOptions.repeatTimeout
-                                logOptions = logOptions.copy(
-                                    repeatTimeout = value
-                                )
-                                Log.i(ACTIONS_TAG, "Repeat Timeout (ms) is set to ${value.inWholeMilliseconds}ms")
-                            },
-                            label = { Text("Repeat Timeout (ms)") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-
-                    // Start Button
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        onClick = {
-                            viewModel.startLogGenerator(logOptions)
-                            Log.i(ACTIONS_TAG, "Start custom job button has been pushed")
-                        }
-                    ) {
-                        Text("Start")
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-            }
-        }
+        LogsGenerator()
         Spacer(modifier = Modifier.height(16.dp))
 
         SpecialActionsSpoiler()
         Spacer(modifier = Modifier.height(16.dp))
 
-        StartPresets(getLogOptionsPresets(),viewModel)
+        ComposableList(list)
+    }
+}
+
+@Composable
+fun LogsGenerator() {
+    val viewModel: LogGeneratorViewModel = viewModel()
+    DropDown("Генератор логов в цикле") {
+        CustomLogMenu(viewModel)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        StartPresets(getLogOptionsPresets(), viewModel)
         Spacer(modifier = Modifier.height(16.dp))
 
         RunningJobsList(viewModel)
     }
 }
+
+@Composable
+fun CustomLogMenu(viewModel: LogGeneratorViewModel) {
+    var logOptions by remember { mutableStateOf(LogOptions()) }
+    DropDown("Создать кастомные логи") {
+        DropdownMenuForEnum(
+            label = "Log Level",
+            selectedOption = logOptions.logLevel,
+            options = LogLevel.entries.toTypedArray(),
+            onSelectionChange = {
+                logOptions = logOptions.copy(logLevel = it)
+                Log.i(ACTIONS_TAG, "Log Level is set to $it")
+            }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        DropdownMenuForEnum(
+            label = "Message Type",
+            selectedOption = logOptions.messageType,
+            options = MessageType.entries.toTypedArray(),
+            onSelectionChange = {
+                logOptions = logOptions.copy(messageType = it)
+                Log.i(ACTIONS_TAG, "Message Type is set to $it")
+            }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        if ((logOptions.messageType == MessageType.RANDOM) ||
+            (logOptions.messageType == MessageType.RANDOM_STRING)
+        ) {
+            OutlinedTextField(
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
+                value = logOptions.randomMessageLength.toString(),
+                onValueChange = {
+                    val value = it.toIntOrNull()
+                        ?: logOptions.randomMessageLength
+                    logOptions = logOptions.copy(
+                        randomMessageLength = value
+                    )
+                    Log.i(ACTIONS_TAG, "randomMessageLength is set to $value")
+                },
+                label = { Text("Random Message Length") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        if ((logOptions.messageType == MessageType.STRING)) {
+            OutlinedTextField(
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
+                value = logOptions.customMessage,
+                onValueChange = {
+                    logOptions = logOptions.copy(customMessage = it)
+                    Log.i(ACTIONS_TAG, "Custom Message is set to $it")
+                },
+                label = { Text("Custom Message") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        OutlinedTextField(
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
+            value = logOptions.tag,
+            onValueChange = {
+                logOptions = logOptions.copy(tag = it)
+                Log.i(ACTIONS_TAG, "Tag is set to $it")
+            },
+            label = { Text("Tag") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                checked = logOptions.shouldRepeat,
+                onCheckedChange = {
+                    logOptions = logOptions.copy(shouldRepeat = it)
+                    Log.i(
+                        ACTIONS_TAG,
+                        "Repeat checkbox has been ${if (it) "checked" else "unchecked"}"
+                    )
+                }
+            )
+            Text("Repeat")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (logOptions.shouldRepeat) {
+
+            OutlinedTextField(
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
+                value = logOptions.repeatTimeout.inWholeMilliseconds.toString(),
+                onValueChange = {
+                    val value = it.toLongOrNull()
+                        ?.toDuration(DurationUnit.MILLISECONDS)
+                        ?: logOptions.repeatTimeout
+                    logOptions = logOptions.copy(
+                        repeatTimeout = value
+                    )
+                    Log.i(
+                        ACTIONS_TAG,
+                        "Repeat Timeout (ms) is set to ${value.inWholeMilliseconds}ms"
+                    )
+                },
+                label = { Text("Repeat Timeout (ms)") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Start Button
+        Button(
+            modifier = Modifier
+                .fillMaxWidth(),
+            onClick = {
+                viewModel.startLogGenerator(logOptions)
+                Log.i(ACTIONS_TAG, "Start custom job button has been pushed")
+            }
+        ) {
+            Text("Start")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
 
 @Composable
 fun RunningJobsList(viewModel: LogGeneratorViewModel) {
@@ -283,7 +271,7 @@ fun RunningJobsList(viewModel: LogGeneratorViewModel) {
                                 Log.i(ACTIONS_TAG, "Stop job ${it.second} button has been pushed")
                                 onStopJob(it.first)
                             },
-                            modifier = Modifier.weight(2f)
+                            modifier = Modifier.weight(3f)
                         ) {
                             Text("Stop")
                         }
@@ -355,51 +343,12 @@ fun SpecialActionButton(specialActionType: SpecialActionType) {
 
 @Composable
 fun SpecialActionsSpoiler() {
-    var expanded by remember { mutableStateOf(false) }
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .clickable {
-                    expanded = !expanded
-                    Log.i(
-                        ACTIONS_TAG, "Spoiler for SpecialActions has been clicked"
-                    )
-                    Log.i(
-                        STATE_TAG, "Spoiler for SpecialActions is ${if (expanded) "opened" else "closed"}"
-                    )
-                }
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Особые события",
-                modifier = Modifier.weight(1f)
-            )
-            Icon(
-                imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                contentDescription = "Expand"
-            )
-        }
-
-        AnimatedVisibility(
-            visible = expanded,
-            enter = expandVertically(),
-            exit = shrinkVertically(),
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-        ) {
-            Column {
-                Spacer(modifier = Modifier.height(16.dp))
-                SpecialActionButton(SpecialActionType.ANR)
-                SpecialActionButton(SpecialActionType.CRASH)
-                SpecialActionButton(SpecialActionType.NPE)
-                SpecialActionButton(SpecialActionType.NON_FATAL)
-            }
-        }
+    DropDown("Особые события") {
+        Spacer(modifier = Modifier.height(16.dp))
+        SpecialActionButton(SpecialActionType.ANR)
+        SpecialActionButton(SpecialActionType.CRASH)
+        SpecialActionButton(SpecialActionType.NPE)
+        SpecialActionButton(SpecialActionType.NON_FATAL)
     }
 }
 
@@ -440,6 +389,81 @@ fun StopAllJobs(viewModel: LogGeneratorViewModel) {
         )
     }
     Spacer(modifier = Modifier.height(16.dp))
+}
+
+@Composable
+fun DropDown(text:String, content: @Composable () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .clickable {
+                    expanded = !expanded
+                    Log.i(
+                        ACTIONS_TAG, "Spoiler for $text has been clicked"
+                    )
+                    Log.i(
+                        STATE_TAG,
+                        "Spoiler for $text is ${if (expanded) "opened" else "closed"}"
+                    )
+                }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                contentDescription = "Expand"
+            )
+        }
+
+        AnimatedVisibility(
+            visible = expanded,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+            modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp)
+        ) {
+            Column {
+                content()
+            }
+        }
+
+    }
+}
+@Composable
+fun ComposableList(list: SnapshotStateList<String>) {
+    val listState = rememberLazyListState()
+    LaunchedEffect(list.size) {
+        listState.animateScrollToItem(index = list.size - 1)
+    }
+
+    DropDown("Activity States logs") {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                ) {
+                    items(list.size) { index ->
+                        Text(text = "${index+1})  ${list[index]}", modifier = Modifier.padding(4.dp))
+                    }
+                }
+            }
+        }
+    }
+
+
+
 }
 
 fun getLogOptionsPresets():List<LogOptions> {
