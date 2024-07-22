@@ -392,8 +392,8 @@ fun StopAllJobs(viewModel: LogGeneratorViewModel) {
 }
 
 @Composable
-fun DropDown(text:String, content: @Composable () -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
+fun DropDown(text:String, isExpanded: Boolean = false, content: @Composable () -> Unit) {
+    var expanded by remember { mutableStateOf(isExpanded) }
     Card(
         modifier = Modifier
             .fillMaxWidth(),
@@ -445,7 +445,7 @@ fun PastActivityStatesList(list: SnapshotStateList<String>) {
         listState.animateScrollToItem(index = list.size - 1)
     }
 
-    DropDown("Activity States logs") {
+    DropDown("Activity States logs", true) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
                 LazyColumn(

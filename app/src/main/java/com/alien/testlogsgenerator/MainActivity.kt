@@ -24,13 +24,14 @@ class MainActivity : ComponentActivity() {
             if (savedList != null) {
                 listOfStates.addAll(savedList)
             }
-            val saveInstStateLog = "savedInstanceState is not mull"
+            val saveInstStateLog = "onCreate(savedInstanceState: Bundle?), bundle: ${savedInstanceState.hashCode()}"
             listOfStates.add(saveInstStateLog)
             Log.i(mainActivityActionsTag,saveInstStateLog)
+        } else {
+            val logStr = "onCreate(savedInstanceState: Bundle?)"
+            listOfStates.add(logStr)
+            Log.i(mainActivityActionsTag,logStr)
         }
-        val logStr = "onCreate(savedInstanceState: Bundle?)"
-        listOfStates.add(logStr)
-        Log.i(mainActivityActionsTag,logStr)
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -92,22 +93,27 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        val logStr = "onSaveInstanceState(outState: Bundle)"
+
+        val logStr = "onSaveInstanceState(outState: Bundle), bundle: ${outState.hashCode()}"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
-        super.onSaveInstanceState(outState)
         outState.putStringArrayList("log_list", ArrayList(listOfStates))
+        super.onSaveInstanceState(outState)
     }
 
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        val logStr = "onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle)"
+        val logStr = "onSaveInstanceState(outState: Bundle," +
+                " outPersistentState: PersistableBundle), " +
+                "bundle: ${outState.hashCode()}, " +
+                "persistentBundle: ${outPersistentState.hashCode()}"
         listOfStates.add(logStr)
+        outState.putStringArrayList("log_list", ArrayList(listOfStates))
         Log.i(mainActivityActionsTag,logStr)
         super.onSaveInstanceState(outState, outPersistentState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        val logStr = "onRestoreInstanceState(savedInstanceState: Bundle)"
+        val logStr = "onRestoreInstanceState(savedInstanceState: Bundle), bundle: ${savedInstanceState.hashCode()}"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onRestoreInstanceState(savedInstanceState)
@@ -126,5 +132,12 @@ class MainActivity : ComponentActivity() {
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         super.onConfigurationChanged(newConfig)
+    }
+
+    override fun finish() {
+        val logStr = "finish()"
+        listOfStates.add(logStr)
+        Log.i(mainActivityActionsTag,logStr)
+        super.finish()
     }
 }
