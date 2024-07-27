@@ -27,6 +27,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 
 const val ACTIONS_TAG = "UserActions"
 const val STATE_TAG = "AppStates"
@@ -96,6 +106,9 @@ fun MainInterface(list: SnapshotStateList<String>) {
         Spacer(modifier = Modifier.height(16.dp))
 
         PastActivityStatesList(list)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        RequestBluetoothPermission()
     }
 }
 
@@ -461,9 +474,37 @@ fun PastActivityStatesList(list: SnapshotStateList<String>) {
             }
         }
     }
+}
 
+@Composable
+fun RequestBluetoothPermission() {
+    val context = LocalContext.current
 
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { _: Boolean ->
+        }
+    )
 
+    Text("Запрос разрешения показывает ситуацию открытия одного activity поверх нашего.")
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Button(
+        onClick = {
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.CAMERA
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                launcher.launch(Manifest.permission.CAMERA)
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+    ) {
+        Text("Запросить разрешение CAMERA")
+    }
 }
 
 fun getLogOptionsPresets():List<LogOptions> {
