@@ -1,11 +1,14 @@
 package com.alien.testlogsgenerator
 
+import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,25 +17,25 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import com.alien.testlogsgenerator.ui.theme.TestLogsGeneratorTheme
+import org.json.JSONArray
+import org.json.JSONObject
 
 class MainActivity : ComponentActivity() {
     private val mainActivityActionsTag = "MainActivityActions"
     private val listOfStates = mutableStateListOf<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        loadStates()
         if (savedInstanceState != null) {
-            val savedList = savedInstanceState.getStringArrayList("log_list")
-            if (savedList != null) {
-                listOfStates.addAll(savedList)
-            }
             val saveInstStateLog = "onCreate(savedInstanceState: Bundle?), bundle: ${savedInstanceState.hashCode()}"
             listOfStates.add(saveInstStateLog)
             Log.i(mainActivityActionsTag,saveInstStateLog)
         } else {
-            val logStr = "onCreate(savedInstanceState: Bundle?)"
+            val logStr = "onCreate()"
             listOfStates.add(logStr)
             Log.i(mainActivityActionsTag,logStr)
         }
-
+        saveStates()
         super.onCreate(savedInstanceState)
         setContent {
             TestLogsGeneratorTheme {
@@ -43,7 +46,7 @@ class MainActivity : ComponentActivity() {
                     Column(
                         verticalArrangement = Arrangement.Top
                     ) {
-                        MainInterface(listOfStates)
+                        MainInterface(listOfStates,this@MainActivity)
                     }
                 }
             }
@@ -54,6 +57,7 @@ class MainActivity : ComponentActivity() {
         val logStr = "onStart()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
+        saveStates()
         super.onStart()
     }
 
@@ -61,6 +65,7 @@ class MainActivity : ComponentActivity() {
         val logStr = "onResume()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
+        saveStates()
         super.onResume()
     }
 
@@ -68,6 +73,7 @@ class MainActivity : ComponentActivity() {
         val logStr = "onPause()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
+        saveStates()
         super.onPause()
     }
 
@@ -75,6 +81,7 @@ class MainActivity : ComponentActivity() {
         val logStr = "onStop()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
+        saveStates()
         super.onStop()
     }
 
@@ -82,6 +89,7 @@ class MainActivity : ComponentActivity() {
         val logStr = "onRestart()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
+        saveStates()
         super.onRestart()
     }
 
@@ -89,15 +97,51 @@ class MainActivity : ComponentActivity() {
         val logStr = "onDestroy()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
+        saveStates()
         super.onDestroy()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
+    private fun saveStates() {
+        val jsonArray = JSONArray()
+        for (state in listOfStates) {
+            jsonArray.put(state)
+        }
 
+        val jsonObject = JSONObject()
+        jsonObject.put("log_states", jsonArray)
+
+        val prefs = getPreferences(Context.MODE_PRIVATE)
+        prefs.edit().putString("log_states_json", jsonObject.toString()).apply()
+    }
+
+    private fun loadStates() {
+        val prefs = getPreferences(Context.MODE_PRIVATE)
+        val jsonString = prefs.getString("log_states_json", null)
+
+        if (!jsonString.isNullOrEmpty()) {
+            val jsonObject = JSONObject(jsonString)
+            val jsonArray = jsonObject.getJSONArray("log_states")
+
+            for (i in 0 until jsonArray.length()) {
+                listOfStates.add(jsonArray.getString(i))
+            }
+        }
+    }
+
+     fun clearStatesLogs() {
+        listOfStates.clear()
+        val prefs = getPreferences(Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.remove("log_states_json")
+        editor.apply()
+        saveStates()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
         val logStr = "onSaveInstanceState(outState: Bundle), bundle: ${outState.hashCode()}"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
-        outState.putStringArrayList("log_list", ArrayList(listOfStates))
+        saveStates()
         super.onSaveInstanceState(outState)
     }
 
@@ -107,8 +151,8 @@ class MainActivity : ComponentActivity() {
                 "bundle: ${outState.hashCode()}, " +
                 "persistentBundle: ${outPersistentState.hashCode()}"
         listOfStates.add(logStr)
-        outState.putStringArrayList("log_list", ArrayList(listOfStates))
         Log.i(mainActivityActionsTag,logStr)
+        saveStates()
         super.onSaveInstanceState(outState, outPersistentState)
     }
 
@@ -116,6 +160,7 @@ class MainActivity : ComponentActivity() {
         val logStr = "onRestoreInstanceState(savedInstanceState: Bundle), bundle: ${savedInstanceState.hashCode()}"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
+        saveStates()
         super.onRestoreInstanceState(savedInstanceState)
     }
 
@@ -123,6 +168,7 @@ class MainActivity : ComponentActivity() {
         val logStr = "onLowMemory()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
+        saveStates()
         super.onLowMemory()
     }
 
@@ -131,13 +177,24 @@ class MainActivity : ComponentActivity() {
         val logStr = "onConfigurationChanged(newConfig: Configuration)"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
+        saveStates()
         super.onConfigurationChanged(newConfig)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun onTopResumedActivityChanged(isTopResumedActivity: Boolean) {
+        val logStr = "onTopResumedActivityChanged(), isTopResumedActivity = $isTopResumedActivity"
+        listOfStates.add(logStr)
+        Log.i(mainActivityActionsTag,logStr)
+        saveStates()
+        super.onTopResumedActivityChanged(isTopResumedActivity)
     }
 
     override fun finish() {
         val logStr = "finish()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
+        saveStates()
         super.finish()
     }
 }

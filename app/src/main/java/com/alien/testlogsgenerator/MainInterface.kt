@@ -37,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import android.app.Activity
 
 const val ACTIONS_TAG = "UserActions"
 const val STATE_TAG = "AppStates"
@@ -88,7 +89,7 @@ class LogGeneratorViewModel : ViewModel() {
 }
 
 @Composable
-fun MainInterface(list: SnapshotStateList<String>) {
+fun MainInterface(list: SnapshotStateList<String>, mainActivity: MainActivity) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -105,10 +106,23 @@ fun MainInterface(list: SnapshotStateList<String>) {
         SpecialActionsSpoiler()
         Spacer(modifier = Modifier.height(16.dp))
 
-        PastActivityStatesList(list)
+        PastActivityStatesList(list, mainActivity)
         Spacer(modifier = Modifier.height(16.dp))
 
         RequestBluetoothPermission()
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val context = LocalContext.current
+        if (context is Activity) {
+            Button(
+                onClick = { context.finish() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text("Finish Activity")
+            }
+        }
     }
 }
 
@@ -452,10 +466,10 @@ fun DropDown(text:String, isExpanded: Boolean = false, content: @Composable () -
     }
 }
 @Composable
-fun PastActivityStatesList(list: SnapshotStateList<String>) {
+fun PastActivityStatesList(list: SnapshotStateList<String>, mainActivity: MainActivity) {
     val listState = rememberLazyListState()
     LaunchedEffect(list.size) {
-        listState.animateScrollToItem(index = list.size - 1)
+        listState.animateScrollToItem(index = list.size) //тут нет -1 так как ниже мы всегда добавляем кнопку в конец
     }
 
     DropDown("Activity States logs", true) {
@@ -465,10 +479,22 @@ fun PastActivityStatesList(list: SnapshotStateList<String>) {
                     state = listState,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
+                        .height(350.dp)
                 ) {
                     items(list.size) { index ->
                         Text(text = "${index+1})  ${list[index]}", modifier = Modifier.padding(4.dp))
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = { mainActivity.clearStatesLogs() },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp)
+                        ) {
+                            Text("Очистить лог")
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
