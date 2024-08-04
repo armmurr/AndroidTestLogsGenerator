@@ -81,7 +81,6 @@ class LogGeneratorViewModel : ViewModel() {
         val index = _startedJobs.indexOfFirst { it.first == job }
         if (index >= 0) {
             val jobName = _startedJobs[index]
-            //_startedJobs[index] = _startedJobs[index].copy(first = null)
             _startedJobs.remove(_startedJobs[index])
             Log.i(STATE_TAG,"[stopJob] Job ${jobName.second} has been stopped")
         }

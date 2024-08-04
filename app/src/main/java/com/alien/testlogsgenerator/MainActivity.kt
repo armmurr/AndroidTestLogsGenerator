@@ -19,6 +19,9 @@ import androidx.compose.ui.Modifier
 import com.alien.testlogsgenerator.ui.theme.TestLogsGeneratorTheme
 import org.json.JSONArray
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     private val mainActivityActionsTag = "MainActivityActions"
@@ -31,7 +34,7 @@ class MainActivity : ComponentActivity() {
             listOfStates.add(saveInstStateLog)
             Log.i(mainActivityActionsTag,saveInstStateLog)
         } else {
-            val logStr = "onCreate()"
+            val logStr = "${getCurrentTime()}: onCreate()"
             listOfStates.add(logStr)
             Log.i(mainActivityActionsTag,logStr)
         }
@@ -54,7 +57,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStart() {
-        val logStr = "onStart()"
+        val logStr = "${getCurrentTime()}: onStart()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
@@ -62,7 +65,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onResume() {
-        val logStr = "onResume()"
+        val logStr = "${getCurrentTime()}: onResume()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
@@ -70,7 +73,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onPause() {
-        val logStr = "onPause()"
+        val logStr = "${getCurrentTime()}: onPause()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
@@ -78,7 +81,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() {
-        val logStr = "onStop()"
+        val logStr = "${getCurrentTime()}: onStop()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
@@ -86,7 +89,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onRestart() {
-        val logStr = "onRestart()"
+        val logStr = "${getCurrentTime()}: onRestart()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
@@ -94,7 +97,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        val logStr = "onDestroy()"
+        val logStr = "${getCurrentTime()}: onDestroy()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
@@ -138,7 +141,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        val logStr = "onSaveInstanceState(outState: Bundle), bundle: ${outState.hashCode()}"
+        val logStr = "${getCurrentTime()}: onSaveInstanceState(outState: Bundle), bundle: ${outState.hashCode()}"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
@@ -146,7 +149,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        val logStr = "onSaveInstanceState(outState: Bundle," +
+        val logStr = "${getCurrentTime()}: onSaveInstanceState(outState: Bundle," +
                 " outPersistentState: PersistableBundle), " +
                 "bundle: ${outState.hashCode()}, " +
                 "persistentBundle: ${outPersistentState.hashCode()}"
@@ -157,7 +160,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        val logStr = "onRestoreInstanceState(savedInstanceState: Bundle), bundle: ${savedInstanceState.hashCode()}"
+        val logStr = "${getCurrentTime()}: onRestoreInstanceState(savedInstanceState: Bundle), bundle: ${savedInstanceState.hashCode()}"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
@@ -165,7 +168,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onLowMemory() {
-        val logStr = "onLowMemory()"
+        val logStr = "${getCurrentTime()}: onLowMemory()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
@@ -173,8 +176,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        // не будет вызываться так как в манифесте не прописан android:configChanges
-        val logStr = "onConfigurationChanged(newConfig: Configuration)"
+        val logStr = "${getCurrentTime()}: onConfigurationChanged(newConfig: Configuration)"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
@@ -183,7 +185,7 @@ class MainActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onTopResumedActivityChanged(isTopResumedActivity: Boolean) {
-        val logStr = "onTopResumedActivityChanged(), isTopResumedActivity = $isTopResumedActivity"
+        val logStr = "${getCurrentTime()}: onTopResumedActivityChanged(), isTopResumedActivity = $isTopResumedActivity"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
@@ -191,10 +193,16 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun finish() {
-        val logStr = "finish()"
+        val logStr = "${getCurrentTime()}: finish()"
         listOfStates.add(logStr)
         Log.i(mainActivityActionsTag,logStr)
         saveStates()
         super.finish()
+    }
+
+    private fun getCurrentTime(): String {
+        val currentDate = Date()
+        val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        return formatter.format(currentDate)
     }
 }
