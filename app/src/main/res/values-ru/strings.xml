@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">TestLogsGenerator</string>
+    <string name="finish_activity">Завершить Activity</string>
+    <string name="start">Старт</string>
+    <string name="stop">Стоп</string>
+    <string name="clear_log">Очистить лог</string>
+    <string name="request_camera_permission">Запросить разрешение CAMERA</string>
+    <string name="log_level">Уровень лога</string>
+    <string name="message_type">Тип сообщения</string>
+    <string name="random_message_length">Длина случайного сообщения</string>
+    <string name="custom_message">Пользовательское сообщение</string>
+    <string name="tag">Тег</string>
+    <string name="repeat">Повторять</string>
+    <string name="repeat_timeout_ms">Тайм-аут повтора (мс)</string>
+    <string name="log_generator_loop">Генератор логов в цикле</string>
+    <string name="create_custom_logs">Создать кастомные логи</string>
+    <string name="running_tasks">Запущенные задачи:</string>
+    <string name="special_events">Особые события</string>
+    <string name="activity_states_logs">Логи состояний Activity</string>
+    <string name="request_permission_description">Запрос разрешения показывает ситуацию открытия одного activity поверх нашего.</string>
+    <string name="spoiler_log_generator_text">Спойлер для Генератор логов в цикле</string>
+    <string name="spoiler_custom_log_text">Спойлер для Создать кастомные логи</string>
+    <string name="spoiler_activity_states_text">Спойлер для Логи состояний Activity</string>
+    <string name="spoiler_special_actions_text">Спойлер для Особые события</string>
+    <string name="start_test_presets">Запустить тестовые пресеты</string>
+    <string name="stop_all_jobs">Остановить все задачи</string>
+    <string name="expand_arrow_content_description">Развернуть</string>
+</resources>

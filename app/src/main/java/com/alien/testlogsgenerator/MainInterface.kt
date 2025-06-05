@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import android.app.Activity
+import androidx.compose.ui.res.stringResource
 
 const val ACTIONS_TAG = "UserActions"
 const val STATE_TAG = "AppStates"
@@ -119,7 +120,7 @@ fun MainInterface(list: SnapshotStateList<String>, mainActivity: MainActivity) {
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text("Finish Activity")
+                Text(stringResource(R.string.finish_activity))
             }
         }
     }
@@ -128,7 +129,7 @@ fun MainInterface(list: SnapshotStateList<String>, mainActivity: MainActivity) {
 @Composable
 fun LogsGenerator() {
     val viewModel: LogGeneratorViewModel = viewModel()
-    DropDown("Генератор логов в цикле") {
+    DropDown(stringResource(R.string.log_generator_loop)) {
         CustomLogMenu(viewModel)
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -142,9 +143,9 @@ fun LogsGenerator() {
 @Composable
 fun CustomLogMenu(viewModel: LogGeneratorViewModel) {
     var logOptions by remember { mutableStateOf(LogOptions()) }
-    DropDown("Создать кастомные логи") {
+    DropDown(stringResource(R.string.create_custom_logs)) {
         DropdownMenuForEnum(
-            label = "Log Level",
+            label = stringResource(R.string.log_level),
             selectedOption = logOptions.logLevel,
             options = LogLevel.entries.toTypedArray(),
             onSelectionChange = {
@@ -154,7 +155,7 @@ fun CustomLogMenu(viewModel: LogGeneratorViewModel) {
         )
         Spacer(modifier = Modifier.height(8.dp))
         DropdownMenuForEnum(
-            label = "Message Type",
+            label = stringResource(R.string.message_type),
             selectedOption = logOptions.messageType,
             options = MessageType.entries.toTypedArray(),
             onSelectionChange = {
@@ -177,7 +178,7 @@ fun CustomLogMenu(viewModel: LogGeneratorViewModel) {
                     )
                     Log.i(ACTIONS_TAG, "randomMessageLength is set to $value")
                 },
-                label = { Text("Random Message Length") },
+                label = { Text(stringResource(R.string.random_message_length)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -190,7 +191,7 @@ fun CustomLogMenu(viewModel: LogGeneratorViewModel) {
                     logOptions = logOptions.copy(customMessage = it)
                     Log.i(ACTIONS_TAG, "Custom Message is set to $it")
                 },
-                label = { Text("Custom Message") },
+                label = { Text(stringResource(R.string.custom_message)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -202,7 +203,7 @@ fun CustomLogMenu(viewModel: LogGeneratorViewModel) {
                 logOptions = logOptions.copy(tag = it)
                 Log.i(ACTIONS_TAG, "Tag is set to $it")
             },
-            label = { Text("Tag") },
+            label = { Text(stringResource(R.string.tag)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -217,7 +218,7 @@ fun CustomLogMenu(viewModel: LogGeneratorViewModel) {
                     )
                 }
             )
-            Text("Repeat")
+            Text(stringResource(R.string.repeat))
         }
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -238,7 +239,7 @@ fun CustomLogMenu(viewModel: LogGeneratorViewModel) {
                         "Repeat Timeout (ms) is set to ${value.inWholeMilliseconds}ms"
                     )
                 },
-                label = { Text("Repeat Timeout (ms)") },
+                label = { Text(stringResource(R.string.repeat_timeout_ms)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -253,7 +254,7 @@ fun CustomLogMenu(viewModel: LogGeneratorViewModel) {
                 Log.i(ACTIONS_TAG, "Start custom job button has been pushed")
             }
         ) {
-            Text("Start")
+            Text(stringResource(R.string.start))
         }
         Spacer(modifier = Modifier.height(16.dp))
     }
@@ -276,7 +277,7 @@ fun RunningJobsList(viewModel: LogGeneratorViewModel) {
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Text(
-                        text = "Запущенные задачи: ",
+                        text = stringResource(R.string.running_tasks),
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
@@ -299,7 +300,7 @@ fun RunningJobsList(viewModel: LogGeneratorViewModel) {
                             },
                             modifier = Modifier.weight(3f)
                         ) {
-                            Text("Stop")
+                            Text(stringResource(R.string.stop))
                         }
                     }
                 }
@@ -369,7 +370,7 @@ fun SpecialActionButton(specialActionType: SpecialActionType) {
 
 @Composable
 fun SpecialActionsSpoiler() {
-    DropDown("Особые события") {
+    DropDown(stringResource(R.string.special_events)) {
         Spacer(modifier = Modifier.height(16.dp))
         SpecialActionButton(SpecialActionType.ANR)
         SpecialActionButton(SpecialActionType.CRASH)
@@ -393,7 +394,7 @@ fun StartPresets(logOptionsList: List<LogOptions>, viewModel: LogGeneratorViewMo
             .height(50.dp)
     ) {
         Text(
-            text = "Запустить тестовые пресеты",
+            text = stringResource(R.string.start_test_presets),
         )
     }
     Spacer(modifier = Modifier.height(16.dp))
@@ -411,7 +412,7 @@ fun StopAllJobs(viewModel: LogGeneratorViewModel) {
             .height(50.dp)
     ) {
         Text(
-            text = "Остановить все задачи",
+            text = stringResource(R.string.stop_all_jobs),
         )
     }
     Spacer(modifier = Modifier.height(16.dp))
@@ -446,7 +447,7 @@ fun DropDown(text:String, isExpanded: Boolean = false, content: @Composable () -
             )
             Icon(
                 imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                contentDescription = "Expand"
+                contentDescription = stringResource(R.string.expand_arrow_content_description)
             )
         }
 
@@ -471,7 +472,7 @@ fun PastActivityStatesList(list: SnapshotStateList<String>, mainActivity: MainAc
         listState.animateScrollToItem(index = list.size) //тут нет -1 так как ниже мы всегда добавляем кнопку в конец
     }
 
-    DropDown("Activity States logs", true) {
+    DropDown(stringResource(R.string.activity_states_logs), true) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
                 LazyColumn(
@@ -491,7 +492,7 @@ fun PastActivityStatesList(list: SnapshotStateList<String>, mainActivity: MainAc
                                 .fillMaxWidth()
                                 .height(50.dp)
                         ) {
-                            Text("Очистить лог")
+                            Text(stringResource(R.string.clear_log))
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -511,7 +512,7 @@ fun RequestBluetoothPermission() {
         }
     )
 
-    Text("Запрос разрешения показывает ситуацию открытия одного activity поверх нашего.")
+    Text(stringResource(R.string.request_permission_description))
     Spacer(modifier = Modifier.height(16.dp))
 
     Button(
@@ -528,7 +529,7 @@ fun RequestBluetoothPermission() {
             .fillMaxWidth()
             .height(50.dp)
     ) {
-        Text("Запросить разрешение CAMERA")
+        Text(stringResource(R.string.request_camera_permission))
     }
 }
 
