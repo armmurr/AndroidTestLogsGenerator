@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">TestLogsGenerator</string>
+    <string name="finish_activity">Finish Activity</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="clear_log">Clear Log</string>
+    <string name="request_camera_permission">Request CAMERA Permission</string>
+    <string name="log_level">Log Level</string>
+    <string name="message_type">Message Type</string>
+    <string name="random_message_length">Random Message Length</string>
+    <string name="custom_message">Custom Message</string>
+    <string name="tag">Tag</string>
+    <string name="repeat">Repeat</string>
+    <string name="repeat_timeout_ms">Repeat Timeout (ms)</string>
+    <string name="log_generator_loop">Log Generator Loop</string>
+    <string name="create_custom_logs">Create Custom Logs</string>
+    <string name="running_tasks">Running Tasks:</string>
+    <string name="special_events">Special Events</string>
+    <string name="activity_states_logs">Activity States Logs</string>
+    <string name="request_permission_description">Requesting permission shows a scenario where one activity opens on top of ours.</string>
+    <string name="spoiler_log_generator_text">Spoiler for Log Generator Loop</string>
+    <string name="spoiler_custom_log_text">Spoiler for Create Custom Logs</string>
+    <string name="spoiler_activity_states_text">Spoiler for Activity States Logs</string>
+    <string name="spoiler_special_actions_text">Spoiler for Special Events</string>
+    <string name="start_test_presets">Start Test Presets</string>
+    <string name="stop_all_jobs">Stop All Jobs</string>
+    <string name="expand_arrow_content_description">Expand</string>
 </resources>
